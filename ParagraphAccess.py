@@ -7,26 +7,25 @@ def call_word_macro(teamNo,student, paragraphTitle, tag, startDateTime, endDateT
     word = win32com.client.Dispatch('Word.Application')
     word.Visible = False  # Set to False to run in background
 
-    template_file = f"{configfile_path}\\Business Report Template V0.1.docm"
-
-    # Open a document
-    doc = word.Documents.Open(template_file)
-
     # Call the macro and pass the value
     try:
-        word.Application.Run("AssignAccessToContentControl", student,paragraphTitle,tag, startDateTime, endDateTime)
-        # Save a copy of the document
         filename_prefix="Business Report Team"
         extension = ".docm"
         target_filename = f"{configfile_path}\\teams\\{filename_prefix}_{teamNo}{extension}"
-        doc.SaveAs(target_filename)
+
+        # Open a document
+        doc = word.Documents.Open(target_filename, ReadOnly=False)
+        word.Application.Run("AssignAccessToContentControl", student,paragraphTitle,tag, startDateTime, endDateTime)
+        # Save a copy of the document
+        doc.Save()
+        doc.Close()
+        word.Quit()
 
         print("Assignment completed and copy of the document created successfully.")
     except Exception as e:
         print(f"Error calling macro: {e}")
 
-    doc.Close()
-    word.Quit()
+
 
 def AssignParagraphs():
     # Load the Excel file
